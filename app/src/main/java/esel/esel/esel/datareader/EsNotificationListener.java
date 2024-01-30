@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import esel.esel.esel.util.SP;
+import esel.esel.esel.util.LocalBroadcaster;
 
 /**
  * Created by bernhard on 24-01-18.
@@ -15,7 +16,8 @@ import esel.esel.esel.util.SP;
 public class EsNotificationListener extends NotificationListenerService {
 
     private static List<SGV> lastReadings = new ArrayList<SGV>();
-    
+    private static List<SGV> lastValues = new ArrayList<SGV>();
+
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
         
@@ -35,6 +37,16 @@ public class EsNotificationListener extends NotificationListenerService {
                    }
                 } catch (NumberFormatException err) {
                     err.printStackTrace();
+                }
+
+                if (lastReadings.size() == 2){
+                    lastValues = lastReadings;
+
+                    lastValues.get(lastValues.size() - 1).smooth(lastValues.get(lastValues.size() - 2).value, false);
+
+                    LocalBroadcaster.broadcast(lastValues.get(lastValues.size() - 1));
+
+                    lastReadings.remove(0);
                 }
             }
         }
@@ -78,7 +90,7 @@ public class EsNotificationListener extends NotificationListenerService {
 
         if(lastReadings.size()>0) {
             SGV oldSgv = lastReadings.get(lastReadings.size() - 1);
-            if (value == oldSgv.value && (oldSgv.timestamp + (five_min * 1.05)) > timestamp ) { // no new value
+            if (value == oldSgv.value || (oldSgv.timestamp + (five_min * 1.05)) > timestamp ) { // no new value
                 return null;
             }
         }

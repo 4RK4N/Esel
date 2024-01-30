@@ -23,8 +23,8 @@ public class Esel extends Application {
         super.onCreate();
         sInstance = this;
         sResources = getResources();
-        startReadReceiver();
-        startKeepAliveService();
+        // startReadReceiver();
+        // startKeepAliveService();
     }
 
     public static Esel getsInstance() {
@@ -50,7 +50,7 @@ public class Esel extends Application {
     public synchronized void stopReadReceiver() {
         if (readReceiver != null)
             readReceiver.cancelAlarm(this);
-            readReceiver = null;
+        readReceiver = null;
     }
 
 
